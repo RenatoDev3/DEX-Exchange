@@ -5,42 +5,70 @@ import {
   DownOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
+
 import tokenList from "../tokenList.json";
+import uniswapFactoryABI from "../UniFactory.json";
+import uniPair from "../UniPair.json";
+import uniRouter from "../UniRouter.json";
+import { BigNumber, ethers } from "ethers";
+import { parseEther } from "ethers/lib/utils";
 
 function Swap() {
   const [slippage, setSlippage] = useState(2.5);
   const [tokenOneAmount, setTokenOneAmount] = useState(null);
   const [tokenTwoAmount, setTokenTwoAmount] = useState(null);
-  const [tokenOne, setTokenOne] = useState(tokenList[0]);
+  const [tokenOne, setTokenOne] = useState(tokenList[4]);
   const [tokenTwo, setTokenTwo] = useState(tokenList[1]);
   const [isOpen, setIsOpen] = useState(false);
   const [changeToken, setChangeToken] = useState(1);
   const [prices, setPrices] = useState(null);
 
-  async function fetchPrices(one, two) {
-    const res = await axios.get(`http://localhost:3001/tokenPrice`, {
-      params: { addressOne: one, addressTwo: two },
-    });
+  async function fetchPairAndCalculateAmount(
+    tokenOneAddress,
+    tokenTwoAddress,
+    tokenOneAmount
+  ) {
+    const INFURA_ID = ""; // REPLACE WITH YOUR OWN INFURA_ID
+    const provider = new ethers.providers.JsonRpcProvider(
+      `https://mainnet.infura.io/v3/${INFURA_ID}`
+    );
 
-    console.log(res.data);
-    setPrices(res.data);
-  }
+    const uniswapRouterAddress = "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D";
 
-  useEffect(() => {
-    fetchPrices(tokenList[0].address, tokenList[1].address);
-  });
+    try {
+      const uniswapRouter = new ethers.Contract(
+        uniswapRouterAddress,
+        uniRouter,
+        provider
+      );
 
-  function handleSlippageChange(e) {
-    setSlippage(e.target.value);
+      const amountIn = parseEther(`${tokenOneAmount}`);
+      const path = [tokenOneAddress, tokenTwoAddress];
+      const amount = await uniswapRouter.getAmountsOut(amountIn, path);
+
+      setTokenTwoAmount(
+        parseFloat(ethers.utils.formatEther(amount[1], 6)).toFixed(2)
+      );
+    } catch (error) {
+      console.error("Error fetching pair and calculating amount:", error);
+    }
   }
 
   function changeAmount(e) {
     setTokenOneAmount(e.target.value);
-    if (e.target.value && prices) {
-      setTokenTwoAmount((e.target.value * prices.ratio).toFixed(2));
+    if (e.target.value) {
+      fetchPairAndCalculateAmount(
+        tokenOne.address,
+        tokenTwo.address,
+        e.target.value
+      );
     } else {
       setTokenTwoAmount(null);
     }
+  }
+
+  function handleSlippageChange(e) {
+    setSlippage(e.target.value);
   }
 
   function switchTokens() {
@@ -131,9 +159,13 @@ function Swap() {
             placeholder="0"
             value={tokenOneAmount}
             onChange={changeAmount}
-            // disabled={!prices}
           />
-          <Input placeholder="0" value={tokenTwoAmount} disabled={true} />
+          <Input
+            type="number"
+            placeholder="0"
+            value={tokenTwoAmount}
+            disabled={true}
+          />
           <div className="switchButton" onClick={switchTokens}>
             <ArrowDownOutlined className="switchArrow" />
           </div>
@@ -148,6 +180,17 @@ function Swap() {
             <DownOutlined />
           </div>
         </div>
+        {tokenOneAmount !== null &&
+          tokenOneAmount !== "0" &&
+          tokenOneAmount.trim() !== "" && (
+            <div className="calculate">
+              {tokenTwoAmount !== null
+                ? `1 ${tokenOne.ticker} = ${(
+                    tokenTwoAmount / tokenOneAmount
+                  ).toFixed(2)} ${tokenTwo.ticker}`
+                : "Calculating price..."}
+            </div>
+          )}
         <div className="swapButton" disabled={!tokenOneAmount}>
           Swap
         </div>
