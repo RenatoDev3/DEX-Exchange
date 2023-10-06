@@ -10,8 +10,7 @@ import tokenList from "../tokenList.json";
 import uniswapFactoryABI from "../UniFactory.json";
 import uniPair from "../UniPair.json";
 import uniRouter from "../UniRouter.json";
-import { BigNumber, ethers } from "ethers";
-import { parseEther } from "ethers/lib/utils";
+import { ethers } from "ethers";
 
 function Swap() {
   const [slippage, setSlippage] = useState(2.5);
@@ -21,7 +20,6 @@ function Swap() {
   const [tokenTwo, setTokenTwo] = useState(tokenList[1]);
   const [isOpen, setIsOpen] = useState(false);
   const [changeToken, setChangeToken] = useState(1);
-  const [prices, setPrices] = useState(null);
 
   async function fetchPairAndCalculateAmount(
     tokenOneAddress,
@@ -32,17 +30,29 @@ function Swap() {
     const provider = new ethers.providers.JsonRpcProvider(
       `https://mainnet.infura.io/v3/${INFURA_ID}`
     );
-
+    const uniswapFactoryAddress = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f";
     const uniswapRouterAddress = "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D";
 
+    const uniswapFactory = new ethers.Contract(
+      uniswapFactoryAddress,
+      uniswapFactoryABI,
+      provider
+    );
+
     try {
+      const pairAddress = await uniswapFactory.getPair(
+        tokenOneAddress,
+        tokenTwoAddress
+      );
+      console.log(`Pair Address : ${pairAddress}`);
+
       const uniswapRouter = new ethers.Contract(
         uniswapRouterAddress,
         uniRouter,
         provider
       );
 
-      const amountIn = parseEther(`${tokenOneAmount}`);
+      const amountIn = ethers.utils.parseEther(`${tokenOneAmount}`);
       const path = [tokenOneAddress, tokenTwoAddress];
       const amount = await uniswapRouter.getAmountsOut(amountIn, path);
 

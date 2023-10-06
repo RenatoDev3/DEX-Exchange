@@ -3,7 +3,9 @@ import Logo from "../vite.svg";
 import Eth from "../eth.svg";
 import { Link } from "react-router-dom";
 
-function Header() {
+function Header(props) {
+  const { address, isConnected, connect } = props;
+
   return (
     <header>
       <div className="leftH">
@@ -20,7 +22,11 @@ function Header() {
           <img src={Eth} alt="eth" className="eth" />
           Ethereum
         </div>
-        <div className="connectButton">Connect</div>
+        <div className="connectButton" onClick={connect}>
+          {isConnected
+            ? address.slice(0, 5) + "..." + address.slice(38)
+            : "Connect"}
+        </div>
       </div>
     </header>
   );
