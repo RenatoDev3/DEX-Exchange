@@ -21,6 +21,7 @@ function Swap() {
   const [isOpen, setIsOpen] = useState(false);
   const [changeToken, setChangeToken] = useState(1);
   const [prices, setPrices] = useState(null);
+  const [oneN, setOneN] = useState();
 
   async function fetchPairAndCalculateAmount(
     tokenOneAddress,
@@ -57,9 +58,13 @@ function Swap() {
       const path = [tokenOneAddress, tokenTwoAddress];
       const amount = await uniswapRouter.getAmountsOut(amountIn, path);
 
+      const one_eth = ethers.utils.parseEther("1");
+      const set_eth = await uniswapRouter.getAmountsOut(one_eth, path);
+
       setTokenTwoAmount(
         parseFloat(ethers.utils.formatEther(amount[1], 6)).toFixed(2)
       );
+      setOneN(parseFloat(ethers.utils.formatEther(set_eth[1], 6)).toFixed(2));
     } catch (error) {
       console.error("Error fetching pair and calculating amount:", error);
     }
@@ -196,9 +201,7 @@ function Swap() {
           tokenOneAmount.trim() !== "" && (
             <div className="calculate">
               {tokenTwoAmount !== null
-                ? `1 ${tokenOne.ticker} = ${(
-                    tokenTwoAmount / tokenOneAmount
-                  ).toFixed(2)} ${tokenTwo.ticker}`
+                ? `1 ${tokenOne.ticker} = ${oneN} ${tokenTwo.ticker}`
                 : "Calculating price..."}
             </div>
           )}
