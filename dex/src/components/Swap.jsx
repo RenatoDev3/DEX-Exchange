@@ -55,11 +55,15 @@ function Swap() {
         provider
       );
 
-      const amountIn = ethers.utils.parseEther(`${tokenOneAmount}`);
+      const amountIn = ethers.utils.parseUnits(
+        `${tokenOneAmount}`,
+        `${tokenOne.decimals}`
+      );
+      console.log(amountIn);
       const path = [tokenOneAddress, tokenTwoAddress];
       const amount = await uniswapRouter.getAmountsOut(amountIn, path);
 
-      const one_eth = ethers.utils.parseEther("1");
+      const one_eth = ethers.utils.parseUnits("1", `${tokenOne.decimals}`);
       const set_eth = await uniswapRouter.getAmountsOut(one_eth, path);
 
       setTokenTwoAmount(
