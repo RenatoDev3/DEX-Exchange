@@ -28,7 +28,7 @@ function Swap() {
     tokenTwoAddress,
     tokenOneAmount
   ) {
-    const INFURA_ID = ""; // REPLACE WITH YOUR OWN INFURA_ID
+    const INFURA_ID = import.meta.env.VITE_INFURA_ID;
     const provider = new ethers.providers.JsonRpcProvider(
       `https://mainnet.infura.io/v3/${INFURA_ID}`
     );
@@ -42,11 +42,12 @@ function Swap() {
     );
 
     try {
-      const pairAddress = await uniswapFactory.getPair(
-        tokenOneAddress,
-        tokenTwoAddress
-      );
-      console.log(`Pair Address : ${pairAddress}`);
+      // UNCOMMENT THIS IF YOU WANT TO SEE THE PAIR FETCHED
+      // const pairAddress = await uniswapFactory.getPair(
+      //   tokenOneAddress,
+      //   tokenTwoAddress
+      // );
+      // console.log(`Pair Address : ${pairAddress}`);
 
       const uniswapRouter = new ethers.Contract(
         uniswapRouterAddress,
