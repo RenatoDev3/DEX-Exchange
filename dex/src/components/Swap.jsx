@@ -59,7 +59,6 @@ function Swap() {
         `${tokenOneAmount}`,
         `${tokenOne.decimals}`
       );
-      console.log(amountIn);
       const path = [tokenOneAddress, tokenTwoAddress];
       const amount = await uniswapRouter.getAmountsOut(amountIn, path);
 
@@ -67,9 +66,15 @@ function Swap() {
       const set_eth = await uniswapRouter.getAmountsOut(one_eth, path);
 
       setTokenTwoAmount(
-        parseFloat(ethers.utils.formatEther(amount[1], 6)).toFixed(2)
+        parseFloat(
+          ethers.utils.formatUnits(amount[1], `${tokenTwo.decimals}`)
+        ).toFixed(2)
       );
-      setOneN(parseFloat(ethers.utils.formatEther(set_eth[1], 6)).toFixed(2));
+      setOneN(
+        parseFloat(
+          ethers.utils.formatUnits(set_eth[1], `${tokenTwo.decimals}`)
+        ).toFixed(6)
+      );
     } catch (error) {
       console.error("Error fetching pair and calculating amount:", error);
     }
@@ -100,7 +105,6 @@ function Swap() {
     const two = tokenTwo;
     setTokenOne(two);
     setTokenTwo(one);
-    fetchPrices(two.address, one.address);
   }
 
   function openModal(asset) {
@@ -114,10 +118,8 @@ function Swap() {
     setTokenTwoAmount(null);
     if (changeToken === 1) {
       setTokenOne(tokenList[i]);
-      fetchPrices(tokenList[i].address, tokenTwo.address);
     } else {
       setTokenTwo(tokenList[i]);
-      fetchPrices(tokenOne.address, tokenList[i].address);
     }
     setIsOpen(false);
   }
