@@ -35,17 +35,17 @@
         "decimals": 18
     },
     {
-        "ticker": "WBTC",
-        "img": "https://s2.coinmarketcap.com/static/img/coins/64x64/3717.png",
-        "name": "Wrapped Bitcoin",
-        "address": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
-        "decimals": 8
-    },
-    {
         "ticker": "MATIC",
         "img": "https://s2.coinmarketcap.com/static/img/coins/64x64/3890.png",
         "name": "Polygon Matic",
         "address": "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0",
+        "decimals": 18
+    },
+    {
+        "ticker": "UNI",
+        "img": "https://s2.coinmarketcap.com/static/img/coins/64x64/7083.png",
+        "name": "Uniswap",
+        "address": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
         "decimals": 18
     }
 
